@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/jumaniyozov/gosites/pkg/config"
 	"github.com/jumaniyozov/gosites/pkg/handlers"
+	"github.com/jumaniyozov/gosites/pkg/middlewares"
 	"net/http"
 )
 
@@ -17,12 +18,10 @@ func routes(app *config.AppConfig) http.Handler {
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.Recoverer)
+	mux.Use(middlewares.NoSurf)
 
 	mux.Get("/", handlers.Repo.Home)
 	mux.Get("/about", handlers.Repo.About)
 
-
 	return mux
 }
-
-
