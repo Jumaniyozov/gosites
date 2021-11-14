@@ -7,34 +7,40 @@ import (
 	"net/http"
 )
 
-var Repo *Repository
+var HandlerRepo *HandlerRepository
 
-type Repository struct {
+type HandlerRepository struct {
 	App *config.AppConfig
 }
 
 // NewRepo creates a new repository
-func NewRepo(a *config.AppConfig) *Repository {
-	return &Repository{
+func NewRepo(a *config.AppConfig) *HandlerRepository {
+	return &HandlerRepository{
 		App: a,
 	}
 }
 
 // NewHandlers sets the repository for the handlers
-func NewHandlers(r *Repository) {
-	Repo = r
+func NewHandlers(r *HandlerRepository) {
+	HandlerRepo = r
 }
 
-func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
+func (m *HandlerRepository) Home(w http.ResponseWriter, r *http.Request) {
+	remoteIp := r.RemoteAddr
+	m.App.Session.Put(r.Context(), "remote_ip", remoteIp)
+
+	utils.RenderTemplate(w, "home.page.tmpl", &models.TemplateData{})
+}
+
+func (m *HandlerRepository) About(w http.ResponseWriter, r *http.Request) {
 
 	stringMap := make(map[string]string)
-	stringMap["test"] = "Hello, there."
 
-	utils.RenderTemplate(w, "home.page.tmpl", &models.TemplateData{
+	remoteIp := m.App.Session.GetString(r.Context(), "remote_ip")
+
+	stringMap["remote_ip"] = remoteIp
+
+	utils.RenderTemplate(w, "about.page.tmpl", &models.TemplateData{
 		StringMap: stringMap,
 	})
-}
-
-func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
-	utils.RenderTemplate(w, "about.page.tmpl", &models.TemplateData{})
 }
