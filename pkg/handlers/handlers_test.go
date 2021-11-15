@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/jumaniyozov/gosites/pkg/driver"
+	//"github.com/jumaniyozov/gosites/pkg/driver"
 	"github.com/jumaniyozov/gosites/pkg/models"
 	"log"
 	"net/http"

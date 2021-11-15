@@ -5,7 +5,7 @@
 *.dll
 *.so
 *.dylib
-
+database.yml
 # Test binary, built with `go test -c`
 *.test
 
