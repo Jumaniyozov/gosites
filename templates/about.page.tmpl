@@ -1,16 +1,12 @@
 {{template "base" .}}
-{{define "title"}}
-    About
-{{end}}
-{{define "content"}}
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <h1>About Page</h1>
 
-                <p>{{index .StringMap "remote_ip"}}</p>
-                <img src="./static/images/outside.png" width="1024" height="640" alt="image"/>
-            </div>
+{{define "content"}}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>This is the about page</h1>
+
         </div>
     </div>
+</div>
 {{end}}

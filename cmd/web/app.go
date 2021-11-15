@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/gob"
 	"github.com/alexedwards/scs/v2"
 	"github.com/jumaniyozov/gosites/pkg/config"
 	"github.com/jumaniyozov/gosites/pkg/handlers"
 	"github.com/jumaniyozov/gosites/pkg/middlewares"
+	"github.com/jumaniyozov/gosites/pkg/models"
 	"github.com/jumaniyozov/gosites/pkg/utils"
 	"log"
 	"net/http"
@@ -16,6 +18,7 @@ var session *scs.SessionManager
 
 // InitializeApp initializes application instance
 func InitializeApp() *config.AppConfig {
+	gob.Register(models.Reservation{})
 
 	// is app in production or in development
 	app.InProduction = false
