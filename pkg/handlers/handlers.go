@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/jumaniyozov/gosites/pkg/config"
 	"github.com/jumaniyozov/gosites/pkg/forms"
+	"github.com/jumaniyozov/gosites/pkg/helpers"
 	"github.com/jumaniyozov/gosites/pkg/models"
 	"github.com/jumaniyozov/gosites/pkg/utils"
-	"log"
 	"net/http"
 )
 
@@ -30,9 +30,6 @@ func NewHandlers(r *HandlerRepository) {
 }
 
 func (m *HandlerRepository) Home(w http.ResponseWriter, r *http.Request) {
-	remoteIp := r.RemoteAddr
-	m.App.Session.Put(r.Context(), "remote_ip", remoteIp)
-
 	utils.RenderTemplate(w, r, "home.page.tmpl", &models.TemplateData{})
 }
 
@@ -65,13 +62,15 @@ func (m *HandlerRepository) AvailabilityJSON(w http.ResponseWriter, r *http.Requ
 
 	out, err := json.Marshal(resp)
 	if err != nil {
-		log.Println(err)
+		helpers.ServerError(w, err)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write(out)
 	if err != nil {
-		log.Println(err)
+		helpers.ServerError(w, err)
+		return
 	}
 }
 
@@ -80,7 +79,7 @@ func (m *HandlerRepository) PostAvailability(w http.ResponseWriter, r *http.Requ
 	end := r.Form.Get("end")
 	_, err := w.Write([]byte(fmt.Sprintf("Start date is %v and end date is %v", start, end)))
 	if err != nil {
-		fmt.Println(err)
+		helpers.ServerError(w, err)
 	}
 }
 
@@ -98,7 +97,8 @@ func (m *HandlerRepository) Reservation(w http.ResponseWriter, r *http.Request) 
 func (m *HandlerRepository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		fmt.Println(err)
+		helpers.ServerError(w, err)
+		return
 	}
 
 	reservation := models.Reservation{
@@ -136,7 +136,7 @@ func (m *HandlerRepository) Contact(w http.ResponseWriter, r *http.Request) {
 func (m *HandlerRepository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
 	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		log.Println("cannot get item from session")
+		m.App.ErrorLog.Println("cannot get item from session")
 		m.App.Session.Put(r.Context(), "error", "Can't get reservation from session")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return

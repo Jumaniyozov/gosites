@@ -5,16 +5,20 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/jumaniyozov/gosites/pkg/config"
 	"github.com/jumaniyozov/gosites/pkg/handlers"
+	"github.com/jumaniyozov/gosites/pkg/helpers"
 	"github.com/jumaniyozov/gosites/pkg/middlewares"
 	"github.com/jumaniyozov/gosites/pkg/models"
 	"github.com/jumaniyozov/gosites/pkg/utils"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
 var app config.AppConfig
 var session *scs.SessionManager
+var infoLog *log.Logger
+var errorLog *log.Logger
 
 // InitializeApp initializes application instance
 func InitializeApp() *config.AppConfig {
@@ -22,6 +26,11 @@ func InitializeApp() *config.AppConfig {
 
 	// is app in production or in development
 	app.InProduction = false
+
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
 
 	session = scs.New()
 	session.Lifetime = time.Hour * 24
@@ -42,6 +51,7 @@ func InitializeApp() *config.AppConfig {
 	handlersRepo := handlers.NewRepo(&app)
 	handlers.NewHandlers(handlersRepo)
 	utils.NewTemplates(&app)
+	helpers.NewHelpers(&app)
 
 	middlewareRepo := middlewares.NewMiddlewareRepo(&app)
 	middlewares.NewMiddlewares(middlewareRepo)
